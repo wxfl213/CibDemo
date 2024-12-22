@@ -1,5 +1,6 @@
 package com.example.cibdemo;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -7,14 +8,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.appcam.android.AppInsight;
+import com.appcam.android.VideoUploadCallback;
 
 import java.util.ArrayList;
 
@@ -71,10 +75,25 @@ public class TransactionActivity extends AppCompatActivity {
                 String item = dataList.get(position);
 
                 if (position == dataList.size() - 1) {
-                    isRunning = false;
-                    AppInsight.stopRealTimeReplayWithCompletion(null);
 
-                    finish();
+                    new AlertDialog.Builder(TransactionActivity.this)
+                            .setTitle("提示")
+                            .setMessage("确定进行购买吗？")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 用户点击确定按钮后的操作
+                                    AppInsight.stopRealTimeReplayWithCompletion(new VideoUploadCallback() {
+                                        @Override
+                                        public void onVideoUploadResult(boolean b, String s) {
+                                            Toast.makeText(TransactionActivity.this.getApplicationContext(),"视频上报成功",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    finish();
+                                }
+                            })
+                            .setNegativeButton("取消", null)
+                            .show();
                 }
             }
         });
